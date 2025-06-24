@@ -1,0 +1,20 @@
+Package: benchmarkR
+Type: Package
+Title: Get Information about Benchmarks
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Pierre", "Donat-Bouillud",
+      email = "pierre.donat.bouillud@gmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: Analyzes R benchmarks to find out their characteristics, and ultimately, better understand the results of the benchmark.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+SystemRequirements: C++17
+RoxygenNote: 7.3.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

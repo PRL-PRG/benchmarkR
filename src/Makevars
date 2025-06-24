@@ -1,0 +1,21 @@
+# Both C/C++ flags
+PKG_CPPFLAGS := -DR_NO_REMAP -DSTRICT_R_HEADERS -DUSE_RINTERNALS
+# C++ flags
+PKG_CXXFLAGS := -fexceptions
+# C flags
+PKG_CFLAGS :=
+# Linker flags
+#PKG_LIBS :=
+
+# Allow sources in subdirectories
+CPP_FILES = $(wildcard *.cpp **/*.cpp)
+CC_FILES = $(wildcard *.cc **/*.cc)
+C_FILES = $(wildcard *.c **/*.c)
+
+OBJECTS = $(CPP_FILES:.cpp=.o) $(CC_FILES:.cc=.o) $(C_FILES:.c=.o)
+
+# Add rules for dependency generation
+# %.d: %.cpp
+# 	@$(CXX) $(PKG_CXXFLAGS) -MM -MT $@ -MT $(<:.cpp=.o) $< > $@
+
+# vim: set ft=make:
