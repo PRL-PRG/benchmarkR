@@ -5,6 +5,21 @@
 namespace benchmark
 {
 
+  const char* loopTypeToString(LoopType type)
+  {
+    switch (type)
+    {
+    case LoopType::FOR:
+      return "for";
+    case LoopType::WHILE:
+      return "while";
+    case LoopType::REPEAT:
+      return "repeat";
+    default:
+      return "unknown";
+    }
+  } 
+
   const std::array<size_t, OPCOUNT> opcodeArgCount = {{
       0, // BCMISMATCH_OP
       0, // RETURN_OP
@@ -178,6 +193,27 @@ namespace benchmark
       }
       break;
 
+      case GOTO_OP:
+      { 
+        int target = code[i + 1];
+        // Back jump. That must be a loop!
+        if(target < i) {
+          //Distinguish between while and repeat loops
+          Loop loop(LoopType::REPEAT, target);
+          loop.nb_opcodes = i - target + 1;
+          // TODO: make that more efficient! (we already have the label list)
+          for(int j = target; j < i; j++) {
+            if(code[j] == BRIFNOT_OP) {
+              // This is a while loop
+              loop.type = LoopType::WHILE;
+              break;
+            }
+          }
+          detectedLoops.push_back(loop);
+        }
+      }
+      break;
+
       default:
         break;
       }
@@ -206,7 +242,7 @@ namespace benchmark
       SEXP loopList = PROTECT(Rf_allocVector(VECSXP, 2));
 
       // Set the type of the loop
-      SEXP type = PROTECT(Rf_ScalarString(Rf_mkChar(loop.type == LoopType::FOR ? "for" : "unknown")));
+      SEXP type = PROTECT(Rf_ScalarString(Rf_mkChar(loopTypeToString(loop.type))));
       SET_VECTOR_ELT(loopList, 0, type);
 
       // Set the number of opcodes

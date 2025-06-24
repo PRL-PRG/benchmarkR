@@ -8,6 +8,7 @@ extern "C"
 }
 
 #include <array>
+#include <string>
 
 namespace benchmark
 {
@@ -156,11 +157,15 @@ namespace benchmark
     REPEAT,
   };
 
+  const char* loopTypeToString(LoopType type);
+
+
   struct Loop
   {
     LoopType type;
     int pc; // program counter of the starting opcode
     long nb_opcodes;
+
     Loop(LoopType type, int pc)
         : type(type), pc(pc), nb_opcodes(0) {}
   };
