@@ -166,7 +166,7 @@ namespace benchmark
 
     std::vector<Loop> loopStack;
     std::vector<Loop> detectedLoops;
-    ;
+    
 
     // 1st element is the version so we skip it
     for (int i = 1; i < n; i++)
@@ -197,17 +197,28 @@ namespace benchmark
       { 
         int target = code[i + 1];
         // Back jump. That must be a loop!
+        // This is fragile because break and next will also goto 
+        // But in that case, the loop will be surrounded 
+        // by STARTLOOPCNTXT_OP and ENDLOOPCNTXT_OP
+        // TODO: handle the above case
         if(target < i) {
+          Rprintf("GOTO_OP at %d jumps to %d\n", i, target);
           //Distinguish between while and repeat loops
           Loop loop(LoopType::REPEAT, target);
           loop.nb_opcodes = i - target + 1;
           // TODO: make that more efficient! (we already have the label list)
           for(int j = target; j < i; j++) {
             if(code[j] == BRIFNOT_OP) {
-              // This is a while loop
-              loop.type = LoopType::WHILE;
+              // Check if the br jumps after the loop end
+              // If not, it is just a normal if condition.
+              // The target is the 2nd argument (first is an index to 
+              //  the condition expr itself in the constant pool)
+              if(code[j + 2] >= i) {
+                loop.type = LoopType::WHILE;
+              }
               break;
             }
+            j += opcodeArgCount[code[j]]; // Skip the number of arguments for the opcode
           }
           detectedLoops.push_back(loop);
         }
